@@ -3,19 +3,21 @@
 #define _CAR_H
 
 #include <iostream>
+using namespace std;
 
 class Car
 {
-	std::string name;
-	double speed;
+	string name;
+	string model;
+	int year;
 
 public:
 	Car();
-	Car(std::string name, double speed);
+	Car(string name, string model, int year);
 	~Car();
 	Car(const Car& car);
 	Car& operator = (const Car& other);
-	void print();
+	void drive();
 	void setName(std::string str);
 
 };

@@ -6,7 +6,20 @@
 
 <aside>
 💡 What is memory leak? And what is a dangling pointer?
+- Memory leak is a phenomenon that memory space does not disappear after the program is all run.
+For example if there is not ```delete [] arr;``` after assigning dynamic memory, memory leak will happen.
+- Dangling pointer is an error when referring memory after freeing the memory. For example, that.
+```
+delete []arr;
+arr[3] = 4; // dangling point error!
+```
 </aside>
+
+There are three kind of smart pointer
+- unique_ptr: just one pointer per one instance is possible. For example, ```p_a = p_b;``` is not allowed.
+- weak_ptr: It allows access to multiple pointers per one objects. So many instances can instrict to an address. 
+- shared_ptr: It allows access to multiple pointers per one objects, and shows how many instances are instricting a objects!
+
 
 ## Exercise 01 : Model your own Car
 > Now It’s time to use all the skills that you learn till now!

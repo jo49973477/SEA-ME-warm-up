@@ -1,13 +1,37 @@
 #include "qcontactlist.h"
 #include <QAbstractListModel>
+#include <QFile>
 
 QContactList::QContactList(QObject *parent)
     : QAbstractListModel{parent}
 {
 
+    QFile file("./list.data");
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+        qDebug() << "Cannot find the file";
+        return;
+    }
+
+    QDataStream in(&file);
+    while (!in.atEnd()){
+        QString name, number, email;
+        bool bookmark;
+        in >> name >> number >> email >> bookmark;
+        list.append(Contact(name, number, email, bookmark));
+    }
 }
 
-QContactList::~QContactList(){}
+QContactList::~QContactList(){
+    QFile file("./list.data");
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)){
+        return;
+    }
+
+    QDataStream out(&file);
+    for (int i = 0; i < list.count(); i++){
+        out << list[i].showName() << list[i].showNumber() << list[i].showEmail() << list[i].bookmark();
+    }
+}
 
 QContactList::QContactList(const QContactList& qlist): QAbstractListModel(){
     this->list = qlist.list;
@@ -25,6 +49,7 @@ QHash<int, QByteArray> QContactList::roleNames() const{
     role[nName] = "name";
     role[nNumber] = "number";
     role[nEmail] = "email";
+    role[nBookmark] = "bookmark";
 
     return role;
 }
@@ -46,6 +71,8 @@ QVariant QContactList::data(const QModelIndex &index, int nRole) const{
         return contact.showNumber();
     case nEmail:
         return contact.showEmail();
+    case nBookmark:
+        return contact.bookmark();
     default:
         return QVariant();
     }
@@ -61,7 +88,7 @@ void QContactList::add(QString name, QString number, QString email){
 
 void QContactList::edit(int index, QString name, QString number, QString email){
     list[index].modify(name, number, email);
-    emit dataChanged(createIndex(index,0), createIndex(index,2));
+    emit dataChanged(createIndex(index,0), createIndex(index,3));
 }
 
 void QContactList::remove(int index){
@@ -72,6 +99,7 @@ void QContactList::remove(int index){
 
 void QContactList::bookmark_change(int index){
     list[index].bookmark_change();
+    emit dataChanged(createIndex(index,0), createIndex(index,3));
 }
 
 bool QContactList::bookmarked(int index){

@@ -11,6 +11,7 @@ class ListControl : public QObject
     Q_PROPERTY(QString nowName READ nowName NOTIFY idxChanged)
     Q_PROPERTY(QString nowNumber READ nowNumber NOTIFY idxChanged)
     Q_PROPERTY(QString nowEmail READ nowEmail NOTIFY idxChanged)
+    Q_PROPERTY(bool nowBookmark READ nowBookmark NOTIFY bookmarkChanged)
 
 protected:
     int index = -1;
@@ -27,17 +28,21 @@ public:
     Q_INVOKABLE void add(QString name, QString number, QString email);
     Q_INVOKABLE void edit(int idx, QString name, QString number, QString email);
     Q_INVOKABLE void remove(int idx);
+    Q_INVOKABLE int search(QString item, QString keyword);
+    Q_INVOKABLE void bookmark_change();
 
     QString nowName();
     QString nowNumber();
     QString nowEmail();
     int len(){ return list.rowCount();}
+    bool nowBookmark();
 
     void debug();
 
 signals:
     void idxChanged();
     void listChanged();
+    void bookmarkChanged();
 
 };
 

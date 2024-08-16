@@ -9,6 +9,8 @@ Contact::Contact(): name("John Doe"), number("+0112345678"), email("UNKNOWN@gmai
 Contact::Contact(QString name, QString number, QString email):
     name(name), number(number), email(email), bookmarked(false){}
 
+Contact::Contact(QString name, QString number, QString email, bool bookmarked):
+    name(name), number(number), email(email), bookmarked(bookmarked){}
 
 Contact::~Contact(){}
 

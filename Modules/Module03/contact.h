@@ -13,6 +13,7 @@ public:
 
     Contact();
     Contact(QString name, QString, QString);
+    Contact(QString, QString, QString, bool);
     Contact(bool failed);
     ~Contact();
     Contact(const Contact& contact);

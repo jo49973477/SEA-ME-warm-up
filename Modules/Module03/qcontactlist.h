@@ -7,7 +7,8 @@
 enum enRole{
     nName = Qt::UserRole,
     nNumber,
-    nEmail
+    nEmail,
+    nBookmark,
 };
 
 class QContactList : public QAbstractListModel

@@ -5,10 +5,10 @@ import ListControl 1.0
 
 Window {
     width: 1000
-    height: 480
+    height: 600
     visible: true
     color: "#4f4f4f"
-    title: qsTr("Hello World")
+    title: qsTr("Phonebook")
 
     ListControlModel{
         id: listcontrol
@@ -47,21 +47,24 @@ Window {
         font.family: "Tahoma"
     }
 
-    Rectangle{
+    ScrollView{
 
         id: component_listView
         x:40
-        y:60
+        y:40
         width:650
-        height:380
-        color: "white"
-        radius: 0
+        height:400
+
+        Rectangle{
+            anchors.fill: parent
+            color: "white"
+        }
 
         ListView {
             id: listView
             x: 0
-            y: -20
-            width: 650
+            y: 0
+            width: 640
             height: 400
             snapMode: ListView.NoSnap
             orientation: ListView.Vertical
@@ -123,7 +126,7 @@ Window {
             delegate: Rectangle{
                 border.width: 1
                 border.color: "gray"
-                color: "transparent"
+                color: model.bookmark ? "yellow" : "transparent"
                 width: 650
                 height: 40
 
@@ -255,11 +258,15 @@ Window {
         placeholderTextColor: "transparent"
         font.family: "Tahoma"
 
-        background: Rectangle {
-            color: "#86a6a4"
-            height: 1
-            width: parent.width
-            anchors.bottom: parent.bottom
+        background: Rectangle{
+            anchors.fill: parent
+            color: "transparent"
+            Rectangle {
+                width: parent.width
+                height: 1
+                color: "#86a6a4"
+                anchors.bottom: parent.bottom
+            }
         }
     }
 
@@ -275,11 +282,15 @@ Window {
         placeholderTextColor: "#80ffffff"
         font.family: "Tahoma"
 
-        background: Rectangle {
-            width: parent.width
-            height: 1
-            color: "#86a6a4"
-            anchors.bottom: parent.bottom
+        background: Rectangle{
+            anchors.fill: parent
+            color: "transparent"
+            Rectangle {
+                width: parent.width
+                height: 1
+                color: "#86a6a4"
+                anchors.bottom: parent.bottom
+            }
         }
     }
 
@@ -295,11 +306,15 @@ Window {
         placeholderTextColor: "#80ffffff"
         font.family: "Tahoma"
 
-        background: Rectangle {
-            width: parent.width
-            height: 1
-            color: "#86a6a4"
-            anchors.bottom: parent.bottom
+        background: Rectangle{
+            anchors.fill: parent
+            color: "transparent"
+            Rectangle {
+                width: parent.width
+                height: 1
+                color: "#86a6a4"
+                anchors.bottom: parent.bottom
+            }
         }
     }
 
@@ -315,4 +330,111 @@ Window {
         font.family: "Tahoma"
     }
 
+    ComboBox {
+        id: searchComboBox
+        x: 388
+        y: 478
+        width: 110
+        height: 30
+        font.pointSize: 15
+        textRole: ""
+        font.family: "Tahoma"
+        model: ListModel{
+            id: comboitems
+            ListElement {text: "name"}
+            ListElement {text: "number"}
+            ListElement {text: "email"}
+        }
+    }
+
+    TextField {
+        id: searchfield
+        x: 506
+        y: 483
+        width: 200
+        height: 25
+        color: "#ffffff"
+        verticalAlignment: Text.AlignVCenter
+        placeholderTextColor: "#80ffffff"
+        font.family: "Tahoma"
+        background: Rectangle{
+            anchors.fill: parent
+            color: "transparent"
+            Rectangle {
+                width: parent.width
+                height: 1
+                color: "#86a6a4"
+                anchors.bottom: parent.bottom
+            }
+        }
+    }
+
+    Rectangle {
+        id: searching
+        x: 717
+        y: 473
+        width: 105
+        height: 45
+        color: "#86a6a4"
+        Text {
+            id: _text6
+            color: "#005555"
+            text: qsTr("SEARCH")
+            font.pixelSize: 25
+            rotation: 0
+            font.family: "Tahoma"
+            anchors.centerIn: parent
+        }
+
+        TapHandler {
+            onTapped: {
+                var idx = listcontrol.search(searchComboBox.currentText, searchfield.text)
+                listView.currentIndex = idx
+
+                if (idx === -1){
+                    searchresult.text = "Not Found"
+                }
+                else{
+                    searchresult.text = "item found in index" + idx
+                }
+
+            }
+        }
+    }
+
+    Text {
+        id: searchresult
+        x: 413
+        y: 535
+        width: 60
+        height: 28
+        color: "#ffffff"
+        text: ""
+        font.pixelSize: 15
+        font.family: "Tahoma"
+    }
+
+    Rectangle {
+        id: bookmark
+        x: 40
+        y: 473
+        width: 140
+        height: 45
+        color: listcontrol.nowBookmark ? "yellow" : "#86a6a4"
+        Text {
+            id: _text7
+            color: "#005555"
+            text: listcontrol.nowBookmark ? qsTr("BOOKMARKED") : qsTr("BOOKMARK")
+            font.pixelSize: 20
+            rotation: 0
+            font.family: "Tahoma"
+            anchors.centerIn: parent
+        }
+
+        TapHandler {
+            onTapped: {
+                listcontrol.bookmark_change()
+            }
+        }
+    }
 }

@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include "QContactList.h"
+#include "bookmarkfilterproxymodel.h"
 
 class ListControl : public QObject
 {
@@ -12,10 +13,13 @@ class ListControl : public QObject
     Q_PROPERTY(QString nowNumber READ nowNumber NOTIFY idxChanged)
     Q_PROPERTY(QString nowEmail READ nowEmail NOTIFY idxChanged)
     Q_PROPERTY(bool nowBookmark READ nowBookmark NOTIFY bookmarkChanged)
+    Q_PROPERTY(bool showBookmarkedOnly READ showBookmarkedOnly NOTIFY listShowingChanged)
 
 protected:
-    int index = -1;
+    int index = 0;
     QContactList list;
+    BookmarkFilterProxyModel * filtered = new BookmarkFilterProxyModel();
+    bool only_bookmarked = false;
 
 public:
     explicit ListControl(QObject *parent = nullptr);
@@ -24,18 +28,21 @@ public:
     ListControl& operator= (const ListControl& control);
 
     Q_INVOKABLE QContactList * getModel() {return &list;}
+    Q_INVOKABLE BookmarkFilterProxyModel * getbookmarkedModel() {return filtered;}
     Q_INVOKABLE void selectRow(int idx);
     Q_INVOKABLE void add(QString name, QString number, QString email);
-    Q_INVOKABLE void edit(int idx, QString name, QString number, QString email);
-    Q_INVOKABLE void remove(int idx);
+    Q_INVOKABLE void edit(QString name, QString number, QString email);
+    Q_INVOKABLE void remove();
     Q_INVOKABLE int search(QString item, QString keyword);
     Q_INVOKABLE void bookmark_change();
+    Q_INVOKABLE void list_showing_change();
 
     QString nowName();
     QString nowNumber();
     QString nowEmail();
-    int len(){ return list.rowCount();}
+    int len(){ return (only_bookmarked) ? filtered->rowCount() : list.rowCount();}
     bool nowBookmark();
+    bool showBookmarkedOnly();
 
     void debug();
 
@@ -43,6 +50,7 @@ signals:
     void idxChanged();
     void listChanged();
     void bookmarkChanged();
+    void listShowingChanged();
 
 };
 

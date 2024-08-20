@@ -1,6 +1,6 @@
-import QtQuick 2.15
-import QtQuick.Window 2.15
-import QtQuick.Controls 2.15
+import QtQuick
+import QtQuick.Window
+import QtQuick.Controls
 import ListControl 1.0
 
 Window {
@@ -80,7 +80,7 @@ Window {
                 color: "lightBlue"
             }
 
-            model: listcontrol.getModel()
+            model: listcontrol.showBookmarkedOnly ? listcontrol.getbookmarkedModel() : listcontrol.getModel()
 
             header: Row{
                 height: 40
@@ -126,7 +126,7 @@ Window {
             delegate: Rectangle{
                 border.width: 1
                 border.color: "gray"
-                color: model.bookmark ? "yellow" : "transparent"
+                color: "transparent"
                 width: 650
                 height: 40
 
@@ -142,21 +142,24 @@ Window {
 
                 Row{
                     Text {
-                        padding: 5
+                        padding: 10
+                        color: model.bookmark ? "blue" : "black"
                         font.pixelSize: 17
                         font.family: "Tahoma"
                         width: 170
-                        text: model.name
+                        text: model.bookmark ? "★" + model.name : model.name
                     }
                     Text{
-                        padding: 5
+                        padding: 10
+                        color: model.bookmark ? "blue" : "black"
                         font.pixelSize: 17
                         font.family: "Tahoma"
                         width: 200
                         text: model.number
                     }
                     Text{
-                        padding: 5
+                        padding: 10
+                        color: model.bookmark ? "blue" : "black"
                         font.pixelSize: 17
                         font.family: "Tahoma"
                         width: 275
@@ -187,7 +190,7 @@ Window {
         TapHandler {
             onTapped: {
                 if (listView.currentIndex >= 0){
-                    listcontrol.edit(listView.currentIndex, namefield.text, numberfield.text, emailfield.text)
+                    listcontrol.edit(namefield.text, numberfield.text, emailfield.text)
                 }
             }
         }
@@ -238,7 +241,7 @@ Window {
         TapHandler {
             onTapped:{
                 if (listView.currentIndex >= 0){
-                    listcontrol.remove(listView.currentIndex)
+                    listcontrol.remove()
                     listView.currentIndex = -1
                     listcontrol.selectRow(-1)
                 }
@@ -332,7 +335,7 @@ Window {
 
     ComboBox {
         id: searchComboBox
-        x: 388
+        x: 536
         y: 478
         width: 110
         height: 30
@@ -349,7 +352,7 @@ Window {
 
     TextField {
         id: searchfield
-        x: 506
+        x: 654
         y: 483
         width: 200
         height: 25
@@ -371,7 +374,7 @@ Window {
 
     Rectangle {
         id: searching
-        x: 717
+        x: 865
         y: 473
         width: 105
         height: 45
@@ -379,7 +382,7 @@ Window {
         Text {
             id: _text6
             color: "#005555"
-            text: qsTr("SEARCH")
+            text: listcontrol.showBookmarkedOnly ? qsTr("N/A") : qsTr("SEARCH")
             font.pixelSize: 25
             rotation: 0
             font.family: "Tahoma"
@@ -388,6 +391,10 @@ Window {
 
         TapHandler {
             onTapped: {
+                if (listcontrol.showBookmarkedOnly){
+                    return
+                }
+
                 var idx = listcontrol.search(searchComboBox.currentText, searchfield.text)
                 listView.currentIndex = idx
 
@@ -397,14 +404,13 @@ Window {
                 else{
                     searchresult.text = "item found in index" + idx
                 }
-
             }
         }
     }
 
     Text {
         id: searchresult
-        x: 413
+        x: 561
         y: 535
         width: 60
         height: 28
@@ -433,8 +439,41 @@ Window {
 
         TapHandler {
             onTapped: {
-                listcontrol.bookmark_change()
+                if (listView.currentIndex >= 0){
+                    listcontrol.bookmark_change()
+
+                    if (listcontrol.showBookmarkedOnly){
+                        listView.currentIndex = -1
+                    }
+                }
             }
+        }
+    }
+
+    Rectangle {
+        id: filterBookmark
+        x: 240
+        y: 473
+        width: 220
+        height: 45
+        color: listcontrol.showBookmarkedOnly ? "yellow" : "#86a6a4"
+        Text {
+            id: _text8
+            color: "#005555"
+            text: listcontrol.showBookmarkedOnly ? "BOOKMARK FILTERED" : "FILTER BOOKMARK"
+            font.pixelSize: 20
+            anchors.verticalCenterOffset: 2
+            anchors.horizontalCenterOffset: 0
+            rotation: 0
+            font.family: "Tahoma"
+            anchors.centerIn: parent
+        }
+
+        TapHandler {
+            onTapped: {
+                    listcontrol.list_showing_change()
+                    listView.currentIndex = -1
+                }
         }
     }
 }

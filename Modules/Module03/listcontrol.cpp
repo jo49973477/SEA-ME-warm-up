@@ -2,26 +2,34 @@
 #include "listcontrol.h"
 
 ListControl::ListControl(QObject *parent){
+    filtered->setSourceModel(&list);
 }
 
 ListControl::~ListControl(){
 }
 
 ListControl::ListControl(const ListControl& control): QObject(){
-
     index = control.index;
     list = control.list;
+    filtered->setSourceModel(&list);
 }
 
 ListControl& ListControl::operator= (const ListControl& control){
     this->index = control.index;
     this->list = control.list;
+    filtered->setSourceModel(&list);
 
     return *this;
 }
 
 void ListControl::selectRow(int idx){
-    index = idx;
+    if (!only_bookmarked){
+        index = idx;
+    }
+    else{
+        index = filtered->original_index(idx);
+    }
+
     emit idxChanged();
     emit bookmarkChanged();
 }
@@ -32,13 +40,14 @@ void ListControl::add(QString name, QString number, QString email){
     debug();
 }
 
-void ListControl::edit(int idx, QString name, QString number, QString email){
-    list.edit(idx, name, number, email);
+void ListControl::edit(QString name, QString number, QString email){
+
+    list.edit(index, name, number, email);
     emit listChanged();
 }
 
-void ListControl::remove(int idx){
-    list.remove(idx);
+void ListControl::remove(){
+    list.remove(index);
     emit listChanged();
 }
 
@@ -61,6 +70,10 @@ QString ListControl::nowEmail(){
         return "";
     }
     return list[index].showEmail();
+}
+
+bool ListControl::showBookmarkedOnly(){
+    return only_bookmarked;
 }
 
 void ListControl::debug(){
@@ -104,6 +117,12 @@ int ListControl::search(QString item, QString keyword){
 void ListControl::bookmark_change(){
     list.bookmark_change(index);
     emit bookmarkChanged();
+}
+
+void ListControl::list_showing_change(){
+    only_bookmarked = !only_bookmarked;
+    emit listShowingChanged();
+    emit listChanged();
 }
 
 bool ListControl::nowBookmark(){
